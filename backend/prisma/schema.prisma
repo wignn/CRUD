@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") 
+}
+model User {
+  profilePicture String?
+  id             Int        @id @default(autoincrement())
+  email          String     @unique
+  name           String?
+  password       String
+  profile        Profile?
+  createdAt      DateTime   @default(now())
+  role           Role       @default(USER)
+  verifyToken    String?    @unique
+  tokenCreatedAt DateTime?
+  tokenExpiresAt DateTime?
+  bookMarks      BookMark[]
+  isOnline       Boolean    @default(false)
+}
+
+
+model Profile {
+  sampul String
+  avatar  String?
+  id     Int     @id @default(autoincrement())
+  bio    String?
+  user   User    @relation(fields: [userId], references: [id])
+  userId Int     @unique
+}
+
+
+model BookMark {
+  id     String @id @default(cuid())
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id])
+}
+
+model Book {
+  id          String     @id @default(cuid())
+  title       String
+  author      String
+  genre       Genre[]    @relation("BookGenres")
+  publishedAt DateTime
+  updatedAt   DateTime   @updatedAt
+  coverImage  String?
+  chapters    Chapter[]
+  bookMarks   BookMark[]
+  synopsis    String?
+  status      Status     @default(Ongoing)
+}
+
+
+model Genre {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  books Book[] @relation("BookGenres")
+}
+
+model Chapter {
+  id      String @id @default(cuid())
+  chap    Int? 
+  title   String
+  bookId  String
+  book    Book   @relation(fields: [bookId], references: [id])
+  content String
+}
+
+enum Status {
+  Ongoing
+  Drop
+  Hiatus
+  Complete
+}
+
+enum Role {
+  USER
+  ADMIN
+  QC
+}
