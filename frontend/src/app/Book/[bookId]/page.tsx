@@ -7,6 +7,7 @@ import Axios from "axios";
 import Loading from "@/app/components/Loading";
 import Link from "next/link";
 import { API } from "@/lib/Api";
+import React from "react";
 
 interface Book {
   id: string;
@@ -16,6 +17,13 @@ interface Book {
   synopsis: string;
   status: string;
   chapters?: { id: string; title: string }[];
+  genre: { id: number; name: string }[];
+}
+
+interface Genre {
+  id: number;
+  name: string;
+  books: { id: any; title: string }[];
 }
 
 const Page = () => {
@@ -23,41 +31,83 @@ const Page = () => {
   const bookId = pathname.split("/").pop();
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
+  const [allGenres, setAllGenres] = useState<Genre[]>([]);
+  const [filteredGenres, setFilteredGenres] = useState<Genre[]>([]);
+  const [selectedGenreIds, setSelectedGenreIds] = useState<Set<number>>(new Set());
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      const bookResponse = await Axios.get(`${API}/books/${bookId}`);
+      setBook(bookResponse.data);
+
+      const genreData = await Axios.get(`${API}/genre`);
+      setAllGenres(genreData.data);
+
+      const associatedGenreIds = new Set(bookResponse.data.genre.map((g: Genre) => g.id));
+      const availableGenres = genreData.data.filter((g: Genre) => !associatedGenreIds.has(g.id));
+      setFilteredGenres(availableGenres);
+    } catch (error) {
+      setError("Failed to load book or genres.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const bookResponse = await Axios.get(`${API}/books/${bookId}`);
-        setBook(bookResponse.data);
-      } catch (error) {
-        console.error("Failed to fetch book data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [bookId, API]);
-console.log(bookId)
-
-const deleteChapter = async (chapterId: string) => {
-  try {
-    await Axios.delete(`${API}/chapter/delete?id=${chapterId}`); 
-    if (book) {
-      const updatedChapters = book.chapters.filter(chapter => chapter.id !== chapterId);
-      setBook({ ...book, chapters: updatedChapters });
+    if (bookId) {
+      fetchData();
     }
-  } catch (error) {
-    console.error("Failed to delete chapter:", error);
-  }
-};
+  }, [bookId]);
 
+  const handleCheckboxChange = (genreId: number) => {
+    setSelectedGenreIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(genreId)) {
+        newSet.delete(genreId);
+      } else {
+        newSet.add(genreId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!bookId) {
+      setError("Book ID is missing.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await Axios.post(`${API}/genre/conect`, {
+        bookId,
+        genreIds: Array.from(selectedGenreIds),
+      });
+      await fetchData();
+    } catch (err) {
+      setError("Failed to add genres.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const deleteChapter = async (chapterId: string) => {
+    try {
+      await Axios.delete(`${API}/chapter/delete?id=${chapterId}`);
+      if (book) {
+        const updatedChapters = book.chapters?.filter((chapter) => chapter.id !== chapterId);
+        setBook({ ...book, chapters: updatedChapters });
+      }
+    } catch (error) {
+      console.error("Failed to delete chapter:", error);
+    }
+  };
 
   if (loading) return <Loading />;
 
-  if (!book)
-    return (
-      <p className="text-center mt-10 text-xl text-gray-400">Book not found.</p>
-    );
+  if (!book) return <p className="text-center mt-10 text-xl text-gray-400">Book not found.</p>;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-4">
@@ -73,6 +123,9 @@ const deleteChapter = async (chapterId: string) => {
           <h1 className="text-4xl font-extrabold mb-4 tracking-wide text-white drop-shadow-lg">
             {book.title}
           </h1>
+          <p className="mt-4 text-lg font-medium text-gray-400">
+                  {book.genre.map((g: Genre) => g.name).join(", ")}
+                </p>
           <p className="text-lg font-semibold text-gray-300">{book.author}</p>
           <span
             className={`inline-block px-6 py-2 mt-6 rounded-full text-white font-bold shadow-md ${
@@ -99,9 +152,7 @@ const deleteChapter = async (chapterId: string) => {
       <div className="max-w-5xl mx-auto">
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg backdrop-filter backdrop-blur-md bg-opacity-50">
           <h2 className="text-2xl font-bold mb-4 text-gray-100">Synopsis</h2>
-          <p className="text-base text-gray-300 leading-relaxed">
-            {book.synopsis}
-          </p>
+          <p className="text-base text-gray-300 leading-relaxed">{book.synopsis}</p>
         </div>
 
         <div className="mt-8 flex justify-end">
@@ -115,9 +166,7 @@ const deleteChapter = async (chapterId: string) => {
 
         {book.chapters && book.chapters.length > 0 ? (
           <div className="mt-10">
-            <h2 className="text-lg mx-5 md:text-2xl font-bold mb-4 text-gray-100">
-              Chapters
-            </h2>
+            <h2 className="text-lg mx-5 md:text-2xl font-bold mb-4 text-gray-100">Chapters</h2>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {book.chapters.map((chapter) => (
                 <li
@@ -125,10 +174,7 @@ const deleteChapter = async (chapterId: string) => {
                   className="text-base text-gray-300 bg-gray-800 p-4 rounded-lg shadow-md hover:bg-gray-700 transition-all duration-300 hover:scale-105 transform-gpu"
                 >
                   <Link
-                    href={`/view/${book.id.replace(/ /g, "-")}/${chapter.id.replace(
-                      / /g,
-                      "-"
-                    )}`}
+                    href={`/view/${book.id.replace(/ /g, "-")}/${chapter.id.replace(/ /g, "-")}`}
                   >
                     <span className="truncate">{chapter.title}</span>
                   </Link>
@@ -153,6 +199,29 @@ const deleteChapter = async (chapterId: string) => {
         ) : (
           <p className="text-center mt-4 text-gray-400">No chapters available</p>
         )}
+
+        <form onSubmit={handleSubmit} className="mt-10">
+          <h2 className="text-3xl font-bold mb-4 text-gray-100">Genres</h2>
+          {filteredGenres.map((genre: Genre) => (
+            <div key={genre.id} className="flex items-center mb-2">
+              <input
+                type="checkbox"
+                value={genre.id}
+                checked={selectedGenreIds.has(genre.id)}
+                onChange={() => handleCheckboxChange(genre.id)}
+                className="mr-2 h-5 w-5 accent-blue-500"
+              />
+              <label className="text-lg">{genre.name}</label>
+            </div>
+          ))}
+          <button
+            type="submit"
+            className="bg-blue-600 text-white py-2 px-4 rounded mt-4 hover:bg-blue-700 transition-colors"
+            disabled={submitting || selectedGenreIds.size === 0}
+          >
+            {submitting ? "Applying..." : "Apply Filters"}
+          </button>
+        </form>
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ const features = [
   { title: "Dashboard", href: "/dashboard", description: "Monitor your activity and statistics." },
   { title: "Profile", href: "/profile", description: "Manage and customize your profile." },
   { title: "Message", href: "/GlobalMsg", description: "Connect with others through messages." },
-  { title: "Admin Dasboard", href: "/admin", description: "Only admin" },
+  { title: "Admin Dasboard", href: "/AdminiDasboard", description: "Only admin" },
 ];
 
 const FeatureList = (className: any) => {
