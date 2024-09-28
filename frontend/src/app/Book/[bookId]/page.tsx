@@ -8,6 +8,7 @@ import Loading from "@/app/components/Loading";
 import Link from "next/link";
 import { API } from "@/lib/Api";
 import React from "react";
+import { FaTrash, FaEdit } from "react-icons/fa";
 
 interface Book {
   id: string;
@@ -34,6 +35,7 @@ const Page = () => {
   const [allGenres, setAllGenres] = useState<Genre[]>([]);
   const [filteredGenres, setFilteredGenres] = useState<Genre[]>([]);
   const [selectedGenreIds, setSelectedGenreIds] = useState<Set<number>>(new Set());
+  const [deletingGenreIds, setDeletingGenreIds] = useState<Set<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -105,6 +107,26 @@ const Page = () => {
     }
   };
 
+  
+  const handleDeleteGenre = async (genreId: number) => {
+    setDeletingGenreIds((prev) => new Set(prev).add(genreId));
+    try {
+      await Axios.put(`${API}/genre/disconect`, {
+         bookId, genreId ,
+      });
+      await fetchData();
+    } catch (error) {
+      setError("Failed to delete genre.");
+    } finally {
+      setDeletingGenreIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(genreId);
+        return newSet;
+      });
+    }
+  };
+
+
   if (loading) return <Loading />;
 
   if (!book) return <p className="text-center mt-10 text-xl text-gray-400">Book not found.</p>;
@@ -123,9 +145,20 @@ const Page = () => {
           <h1 className="text-4xl font-extrabold mb-4 tracking-wide text-white drop-shadow-lg">
             {book.title}
           </h1>
-          <p className="mt-4 text-lg font-medium text-gray-400">
-                  {book.genre.map((g: Genre) => g.name).join(", ")}
-                </p>
+          {book.genre.map((genre) => (
+          <div key={genre.id} className="flex mb-2">
+            <span className="text-lg mr-4">{genre.name}</span>
+            <button
+              onClick={() => handleDeleteGenre(genre.id)}
+              disabled={deletingGenreIds.has(genre.id)}
+              className={`bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-700 transition-colors ${
+                deletingGenreIds.has(genre.id) ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {deletingGenreIds.has(genre.id) ? "Deleting..." :  <FaTrash size={15}/>}
+            </button>
+          </div>
+        ))}
           <p className="text-lg font-semibold text-gray-300">{book.author}</p>
           <span
             className={`inline-block px-6 py-2 mt-6 rounded-full text-white font-bold shadow-md ${
@@ -183,13 +216,13 @@ const Page = () => {
                       href={`/${chapter.id}`}
                       className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded-md"
                     >
-                      Edit
+                      <FaEdit size={15}/>
                     </Link>
                     <button
                       onClick={() => deleteChapter(chapter.id)}
                       className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded-md"
                     >
-                      Delete
+                      <FaTrash size={15}/>
                     </button>
                   </div>
                 </li>

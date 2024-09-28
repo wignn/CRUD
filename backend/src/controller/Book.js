@@ -270,7 +270,7 @@ export const createGenre = async (req, res) => {
 
 export const unConectGenre = async (req, res) => {
   try {
-    const { bookId,  genreId } = req.body;
+    const { bookId, genreId } = req.body;
     console.log(bookId, genreId)
     const result = await prisma.book.update({
       where: { id: bookId },
