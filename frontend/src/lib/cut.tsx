@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
-import getCroppedImg from '@/lib/cropImage'; // Utility function to crop the image
+import getCroppedImg from '@/lib/cropImage'; 
 
 interface ImageCropperProps {
-  imageSrc: string; // Source of the image
-  onCropComplete: (croppedAreaPixels: any) => void; // Function called when crop is complete
-  aspect?: number; // Aspect ratio (default is 1 for square)
+  imageSrc: string; 
+  onCropComplete: (croppedAreaPixels: any) => void;
+  aspect?: number;
 }
 
 export const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, onCropComplete, aspect = 1 }) => {
