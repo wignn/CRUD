@@ -32,38 +32,99 @@ export const bookAll = async (req, res) => {
   }
 };
 
+export const bookUpdate = async (req, res) => {
+  try {
+    const { id, title, author, synopsis, imageUrl } = req.body;
+
+    if (!id || !title || !author || !synopsis) {
+      return respone(400, "All fields are required", res);
+    }
+
+    const result = await prisma.book.update({
+      where: {
+        id: id,
+      },
+      data: {
+        title,
+        author,
+        synopsis,
+
+        coverImage: imageUrl,
+      },
+    });
+
+    respone(200, result, res);
+  } catch (err) {
+    console.error("Error occurred while updating book:", err);
+    respone(500, "Error occurred", res);
+  }
+};
+
+export const bookDelete = async (req, res) => {
+  try {
+    const { bookId } = req.body;
+
+    await prisma.chapter.deleteMany({
+      where: { bookId: bookId }, 
+    });
+
+    const result = await prisma.book.delete({
+      where: { id: bookId },
+    });
+
+    respone(200, result, res);
+  } catch (err) {
+    console.error(err); 
+    respone(500, "Error occurred", res);
+  }
+};
+
+
 export const bookSearch = async (req, res) => {
   try {
-    const { query } = req.query;
-
+    const { query, genre } = req.query;
     let books;
-    if (!query) {
-      books = await prisma.book.findMany();
-    } else {
-      books = await prisma.book.findMany({
-        where: {
-          OR: [
-            {
-              title: {
-                contains: query,
-                mode: "insensitive",
-              },
-            },
-            {
-              author: {
-                contains: query,
-                mode: "insensitive",
-              },
-            },
-          ],
-        },
-      });
+    let search = "";
+    if (genre) {
+      search = genre;
     }
+    if (query) {
+      search = query;
+    }
+
+    books = await prisma.book.findMany({
+      include: { genre: true },
+      where: {
+        OR: [
+          {
+            genre: {
+              some: {
+                name: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+          {
+            title: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+          {
+            author: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+    });
 
     return res.status(200).json(books);
   } catch (err) {
     console.error(err);
-    r;
     return res.status(500).json({ message: "An error occurred" });
   }
 };
@@ -271,18 +332,28 @@ export const createGenre = async (req, res) => {
 export const unConectGenre = async (req, res) => {
   try {
     const { bookId, genreId } = req.body;
-    console.log(bookId, genreId)
+    console.log(bookId, genreId);
     const result = await prisma.book.update({
       where: { id: bookId },
       data: {
         genre: {
-          disconnect: { id: parseInt (genreId,10)}
-        }
-      }
+          disconnect: { id: parseInt(genreId, 10) },
+        },
+      },
     });
-    
-    respone(200, result, res)
+
+    respone(200, result, res);
   } catch (err) {
     respone(500, "internal server error", res);
+  }
+};
+
+export const getAllGenre = async (req, res) => {
+  try {
+    const result = await prisma.genre.findMany({});
+
+    respone(200, result, res);
+  } catch (err) {
+    respone(500, "internal server eror");
   }
 };

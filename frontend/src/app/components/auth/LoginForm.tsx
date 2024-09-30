@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 
-export default function LoginForm() {
+const Login:React.FC=()=> {
     const [showPassword, setShowPassword] = useState(false);
     const [formValues, setFormValues] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
@@ -35,6 +35,7 @@ export default function LoginForm() {
         if (res?.error) {
           setError("Login failed: " + res.error);
         } else if (res?.ok) {
+          setError("")
           const result = formValues.email;
           setStatus("Login successful!");
           window.location.href = "/";
@@ -130,5 +131,6 @@ export default function LoginForm() {
         </div>
       </div>
     );
-
 }
+
+export default Login;

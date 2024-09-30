@@ -1,7 +1,7 @@
 "use client";   
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Loading from "./Loading";
+import Loading from "../dist/Loading";
 import { useSession } from "next-auth/react";
 import {API} from '@/lib/Api'
 

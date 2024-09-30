@@ -1,19 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import BooksLatest from "../../../backend/trahs/BookLatest";
-import { Contact } from "./components/contact";
-import FeatureList from "./components/Extend";
-import Home from "./components/Hero";
-import Navbar from "./components/Navbar";
-import BookList from "./components/BookList";
-import {API} from '@/lib/Api'
+import FeatureList from "@/app/components/Landing/FeatureList";
+import Contact from "@/app/components/Landing/contact";
+import Hero from "@/app/components/Landing/Hero";
+import Navbar from "@/app/components/Landing/Navbar";
+import BookList from "@/app/components/Book/BookList";
+import { API } from '@/lib/Api';
 
 const Landing = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
 
   const fetchBooks = async () => {
     setError(null);
@@ -31,7 +29,7 @@ const Landing = () => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchBooks();
   }, [API]);
@@ -64,6 +62,14 @@ const Landing = () => {
     return title.length > maxLength ? title.slice(0, maxLength) + "..." : title;
   };
 
+  const feature = [
+    { title: "Post", href: "/post", description: "Create and share posts with ease." },
+    { title: "Dashboard", href: "/dashboard", description: "Monitor your activity and statistics." },
+    { title: "Profile", href: "/profile", description: "Manage and customize your profile." },
+    { title: "Message", href: "/GlobalMsg", description: "Connect with others through messages." },
+    { title: "Admin Dasboard", href: "/AdminiDasboard", description: "Only admin" },
+  ];
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
@@ -91,9 +97,10 @@ const Landing = () => {
       }}
     >
       <Navbar />
-      <Home />
+      <Hero />
       <FeatureList
-        className={"bg-gray-900 bg-opacity-40 backdrop-blur-lg backdrop-filter w-full"}
+        className={"bg-gray-900 "}
+        features={feature} 
       />
       <BookList
         books={books}

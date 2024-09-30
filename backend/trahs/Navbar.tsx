@@ -1,4 +1,4 @@
-import Profile from "../../frontend/src/app/components/profile";
+import Profile from "../../frontend/src/app/components/profile/profile";
 
 export default function Navbar() {
     return (

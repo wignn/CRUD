@@ -1,6 +1,6 @@
 "use client";
 import { use, useEffect, useState } from "react";
-import PhotoCard from "../components/ProfileCard";
+import PhotoCard from "../components/profile/ProfileCard";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import Loading from "@/app/components/Loading";

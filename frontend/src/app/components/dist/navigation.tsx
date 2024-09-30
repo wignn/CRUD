@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
@@ -53,7 +53,7 @@ const IconButton = ({
   </div>
 );
 
-const PathWidget = () => {
+const PathWidget:React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
   const router = useRouter();

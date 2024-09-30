@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios"; 
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css'; 
@@ -9,7 +9,7 @@ import { API } from "@/lib/Api";
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
-const CreateChapterForm = () => {
+const CreateChapterForm: React.FC = () => {
   const pathname = usePathname();
   const pathParts = pathname.split("/").filter(part => part);
   const bookId = pathParts[1];

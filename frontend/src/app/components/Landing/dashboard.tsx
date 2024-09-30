@@ -1,10 +1,10 @@
 "use client"
-
-import { GetDashboard } from "../../lib/dashboardAction";
-import Search from "./searchBook";
+import { GetDashboard } from "../../../lib/dashboardAction";
+import Search from "../dist/searchBook";
 import Navbar from "./Navbar";
 import { useEffect, useState } from "react";
-import BookList from "./BookList"; 
+import BookList from "../Book/BookList"; 
+import GenreSelector from "../Book/genreSelect"; 
 
 interface Book {
   id: string;
@@ -13,24 +13,26 @@ interface Book {
   genre: string;
   publishedAt: Date;
   coverImage?: string;
+  status: string;
 }
 
 interface DashboardProps {
   query: string;
 }
 
-export default function Dashboard({ query }: DashboardProps) {
+const Dashboard:React.FC <DashboardProps> = ({ query })=> {
   const [books, setBooks] = useState<Book[]>([]);
+  const [genre, setGenre] = useState("");
+
+  const fetchBooks = async () => {
+    const fetchedBooks: Book[] = await GetDashboard(query, genre);
+    setBooks(fetchedBooks);
+  };
 
   useEffect(() => {
-    const fetchBooks = async () => {
-      const fetchedBooks: Book[] = await GetDashboard(query);
-      setBooks(fetchedBooks);
-    };
+    fetchBooks(); 
+  }, [query, genre]);
 
-    fetchBooks();
-  }, [query]);
-  
   const totalBooks = books.length;
   const borrowedBooks = books.filter((book) => book.status === "Drop").length;
   const ongoing = totalBooks - borrowedBooks;
@@ -45,7 +47,7 @@ export default function Dashboard({ query }: DashboardProps) {
           </h1>
           <Search />
         </header>
-
+        <GenreSelector selectedGenre={genre} onSelect={setGenre} /> 
         <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 sm:mt-8 mb-6">
           <div className="flex-1 bg-gray-800 p-4 sm:p-6 rounded-md shadow-md text-center">
             <h2 className="text-lg sm:text-xl font-bold mb-2 sm:mb-4 text-gray-200">
@@ -78,3 +80,5 @@ export default function Dashboard({ query }: DashboardProps) {
     </div>
   );
 }
+
+export default Dashboard;

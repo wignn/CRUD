@@ -19,6 +19,7 @@ interface Book {
   coverImage: string;
   synopsis: string;
   status: string;
+  genre: [];
   chapters?: { id: string; title: string }[];
 }
 
@@ -40,7 +41,7 @@ const BookDetails = () => {
       setBook(bookResponse.data);
       const isMarkResponse = await axios.get(`${API}/isMark/${userId}/${bookId}`);
       setIsBookmarked(isMarkResponse.data);
-      setShowButton(isMarkResponse.data); // Set initial button state
+      setShowButton(isMarkResponse.data); 
     } catch (error) {
       console.error("Failed to fetch book data or bookmark status:", error);
     } finally {
@@ -58,7 +59,7 @@ const BookDetails = () => {
     const timer = setTimeout(() => {
       setShowButton(isBookmarked);
       setFadeClass('fade-in');
-    }, 300); // Same duration as the transition
+    }, 300); 
 
     return () => clearTimeout(timer);
   }, [isBookmarked]);
@@ -93,6 +94,8 @@ const BookDetails = () => {
             >
               {book.status}
             </span>
+            <p>{book.genre.map((genres: any) => genres.name).join(", ")}</p>
+
           </div>
         </div>
 

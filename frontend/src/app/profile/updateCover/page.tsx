@@ -1,4 +1,4 @@
-import { UpdateCover } from "@/app/components/UpdateProfileImage";
+import { UpdateCover } from "@/app/components/profile/UpdateProfileImage";
 
 export default function page (){
 

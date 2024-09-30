@@ -4,7 +4,7 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import Loading from "@/app/components/Loading";
 import {API} from '@/lib/Api'
-import SetingProfile from "../../components/settingProfile";
+import SetingProfile from "../../components/profile/settingProfile";
 
 interface User {
   id: number;

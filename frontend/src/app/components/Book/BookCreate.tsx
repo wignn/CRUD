@@ -1,9 +1,11 @@
-//@ts-nocheck
+
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { SingleImageDropzone } from "./image";
+import { SingleImageDropzone } from "../dist/image";
 import { useEdgeStore } from "@/lib/edgeStore";
+import { FaSearch } from "react-icons/fa";
+
 
 interface Form {
   title: string;
@@ -15,7 +17,7 @@ interface FileUrls {
   url: string;
 }
 
-export default function BookComponent() {
+const BookCreate:React.FC = ({className}:any) => {
   const [form, setForm] = useState<Form>({
     title: "",
     author: "",
@@ -26,25 +28,39 @@ export default function BookComponent() {
   const { edgestore } = useEdgeStore();
   const [imageUrl, setImageUrl] = useState<FileUrls>();
   const [progress, setProgress] = useState(0);
+  const [success, setSuccess] = useState(""); 
 
   useEffect(() => {
     const uploadUrlsToDatabase = async () => {
       try {
-        await axios.post("http://localhost:4000/book/Create", {
+        const uploadBook = await axios.post("http://localhost:4000/book/Create", {
           ...form,
           imageUrl: imageUrl?.url,
         });
+
+        if (uploadBook.status === 200) {
+          setSuccess("Upload berhasil!");
+        
+          setForm({
+            title: "",
+            author: "",
+            synopsis: "",
+            image: "",
+          });
+          setImageFile(undefined); 
+          setImageUrl(undefined); 
+        }
         console.log("Image URL uploaded to database:", imageUrl?.url);
       } catch (error) {
         console.error("Error uploading URL to database:", error);
+        setSuccess("Upload gagal, coba lagi."); 
       }
     };
-  
+
     if (imageUrl?.url) {
       uploadUrlsToDatabase();
     }
   }, [imageUrl]);
-  
 
   const handleUpload = async () => {
     const confirmed = confirm("Are you sure you want to upload?");
@@ -65,10 +81,7 @@ export default function BookComponent() {
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    try {
-    } catch (error) {
-      console.error(error);
-    }
+    handleUpload();
   }
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -77,7 +90,7 @@ export default function BookComponent() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 bg-gray-100 rounded-lg shadow-lg max-w-md mx-auto mt-10">
+    <div className=" bg-opacity-90 backdrop-blur-lg shadow-xl transform transition-transform  flex flex-col items-center w-full justify-center p-6  rounded-lg max-w-md mx-auto my-10">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Upload Image</h1>
       <form onSubmit={handleSubmit} className="text-black w-full">
         <div className="relative mb-4">
@@ -101,7 +114,7 @@ export default function BookComponent() {
             value={form.author}
             onChange={handleInputChange}
             required
-            placeholder="title"
+            placeholder="author"
             className="w-full py-2 px-3 border-b-2 border-gray-600 bg-transparent focus:border-blue-600 outline-none"
           />
           <label className="absolute left-3 -top-2.5 text-gray-500 text-sm transition-all duration-300 transform scale-75 origin-top-left">
@@ -115,7 +128,7 @@ export default function BookComponent() {
             value={form.synopsis}
             onChange={handleInputChange}
             required
-            placeholder="title"
+            placeholder="synopsis"
             className="w-full py-2 px-3 border-b-2 border-gray-600 bg-transparent focus:border-blue-600 outline-none"
           />
           <label className="absolute left-3 -top-2.5 text-gray-500 text-sm transition-all duration-300 transform scale-75 origin-top-left">
@@ -123,11 +136,10 @@ export default function BookComponent() {
           </label>
         </div>
         <button
-          type="button"
-          onClick={handleUpload}
-          className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors"
+          type="submit"
+          className="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition-colors mt-4"
         >
-          Upload Image
+          Submit
         </button>
       </form>
 
@@ -162,6 +174,10 @@ export default function BookComponent() {
           </a>
         </div>
       )}
+      
+      {success && <p className="text-green-500 mt-4">{success}</p>} {/* Menampilkan pesan sukses */}
     </div>
   );
 }
+
+export default BookCreate;

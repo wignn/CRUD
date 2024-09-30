@@ -67,7 +67,6 @@ export const Bookmark = ({ id }: { id: string }) => {
 
 
 export const ReadButton = ({ id }: { id: string }) => {
-  console.log(id);
   return (
     <Link
       href={`/view/${id}`}
@@ -84,7 +83,7 @@ export const AddBookmark = ({ bookId, userId, onDelete, className }: { bookId: s
     setLoading(true);
     try {
       await axios.post(`${API}/bookmark/create`, { userId, bookId });
-      console.log(`Bookmark for book with ID ${bookId} added for user with ID ${userId}`);
+
       onDelete();
     } catch (error) {
       console.error("Error adding bookmark:", error);

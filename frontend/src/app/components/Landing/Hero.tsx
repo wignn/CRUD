@@ -1,6 +1,7 @@
 import Link from "next/link";
+import React from "react";
 
-export default function Home() {
+const Hero:React.FC = ()=> {
   return (
     <div className="text-white min-h-screen">
       <section className="md:h-screen h-1/2 flex flex-col items-center justify-center text-center bg-cover bg-center">
@@ -72,3 +73,5 @@ function Feature({ title, description, icon }: any) {
     </div>
   );
 }
+
+export default Hero

@@ -1,7 +1,7 @@
-import { prisma } from "./prisma";
 import bcrypt from "bcrypt";
 import type { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import axios from "axios";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -23,9 +23,11 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) return null;
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+        // Fetch data from API
+        const { data: users } = await axios.get("http://localhost:4000/users/data");
+
+        // Find user with matching email
+        const user = users.find((user: any) => user.email === credentials.email);
 
         if (!user) return null;
 
@@ -39,7 +41,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
-        //   createdAt: user.createdAt, 
+          // createdAt: user.createdAt,
         };
       },
     }),
@@ -52,7 +54,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
-        //   createdAt: user.createdAt,
+          // createdAt: user.createdAt,
         };
       }
       return token;
@@ -64,7 +66,7 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: token.id,
           name: token.name,
-        //   createdAt: token.createdAt,
+          // createdAt: token.createdAt,
         },
       };
     },

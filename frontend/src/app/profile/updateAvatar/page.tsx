@@ -1,4 +1,4 @@
-import { UpdateAvatar } from "@/app/components/UpdateProfileImage";
+import { UpdateAvatar } from "@/app/components/profile/UpdateProfileImage";
 
 export default function page() {
   return (

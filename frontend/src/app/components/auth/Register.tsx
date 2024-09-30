@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { API } from "@/lib/Api";
 
-function RegisterPage() {
+const Register:React.FC =()=> {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -112,4 +112,4 @@ function RegisterPage() {
   );
 }
 
-export default RegisterPage;
+export default Register;

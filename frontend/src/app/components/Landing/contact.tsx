@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { API } from "@/lib/Api";
 
@@ -10,7 +10,7 @@ interface Email {
   message: string;
 }
 
-export function Contact() {
+const Contact:React.FC = () => {
   const [formData, setFormData] = useState<Email>({
     fromName: "",
     fromEmail: "",
@@ -165,3 +165,5 @@ export function Contact() {
     </section>
   );
 }
+
+export default Contact;

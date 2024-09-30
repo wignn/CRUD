@@ -1,11 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { MenuIcon, XIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import Link from "next/link";
 import { API } from "@/lib/Api";
+
 
 interface user {
   id: number;
@@ -14,7 +15,7 @@ interface user {
   profile: { avatar: string; sampul: string };
 }
 
-const Navbar = () => {
+const Navbar:React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [user, setUser] = useState<user>();
@@ -50,6 +51,9 @@ const Navbar = () => {
           <Link href="/dashboard" className="hover:text-gray-400">
             Novel
           </Link>
+          <Link href="/bookmark" className="hover:text-gray-400">
+            BookMark
+          </Link>
         </div>
 
         {user && (
@@ -63,7 +67,7 @@ const Navbar = () => {
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white text-black rounded-md shadow-lg py-2">
                 <a
-                  href="#"
+                  href="/profile"
                   className="block px-4 py-2 text-sm hover:bg-gray-200"
                 >
                   {user.name}
@@ -75,7 +79,7 @@ const Navbar = () => {
                   {user.email}
                 </a>
                 <a
-                  href="/profile"
+                  href="/profile/setting"
                   className="block px-4 py-2 text-sm hover:bg-gray-200"
                 >
                   Settings
@@ -110,7 +114,7 @@ const Navbar = () => {
           <a href="#" className="block px-4 py-2 hover:bg-gray-800">
             About
           </a>
-          <a href="#" className="block px-4 py-2 hover:bg-gray-800">
+          <a href="/dasboard" className="block px-4 py-2 hover:bg-gray-800">
             Novel
           </a>
           <a href="#" className="block px-4 py-2 hover:bg-gray-800">

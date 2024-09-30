@@ -1,15 +1,18 @@
-import BookCreate from "../components/Book/BookCreate"
+import { About } from "../components/About";
 
-export default function page (){
+export default function AboutPage() {
 
     return (
-        <div className="flex min-h-screen w-f bg-gray-100" style={{
+        <div style={{
             backgroundImage: `url('/bg.jpg')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundAttachment: "fixed",
-          }}><BookCreate className="m-4"/></div>
-        
+          }}>
+        <About />
+
+        </div>
+
     )
 }

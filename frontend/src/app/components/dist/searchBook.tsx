@@ -3,8 +3,9 @@
 import { IoSearch } from "react-icons/io5";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
+import React from "react";
 
-const Search = () => {
+const Search:React.FC = () => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -12,7 +13,6 @@ const Search = () => {
   const handleSearch = useDebouncedCallback((term: string) => {
     // console.log(term);
     const params = new URLSearchParams(searchParams);
-    params.set("page", "1");
     if (term) {
       params.set("query", term);
     } else {

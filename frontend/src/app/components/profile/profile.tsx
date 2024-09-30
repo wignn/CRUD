@@ -15,7 +15,7 @@ interface PhotoCardProps {
     profile: { avatar: string; sampul: string }[];
 
   }
-const Profile = () => {
+const Profile:React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [user, setUser] = useState<PhotoCardProps>(); 
     const { data: session } = useSession();

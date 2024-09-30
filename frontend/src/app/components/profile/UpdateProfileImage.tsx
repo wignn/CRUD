@@ -1,7 +1,7 @@
 "use client";
 
 import { useEdgeStore } from "@/lib/edgeStore";
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "@/lib/cropImage";
 import axios from "axios";
@@ -14,7 +14,7 @@ interface FileUrls {
   thumbnailUrl: string;
 }
 
-export function UpdateAvatar() {
+const UpdateAvatar:React.FC = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const { edgestore } = useEdgeStore();
   const [avatarUrl, setAvatarUrl] = useState<FileUrls>();
@@ -242,3 +242,5 @@ export function UpdateCover() {
     </div>
   );
 }
+
+export default UpdateAvatar;
